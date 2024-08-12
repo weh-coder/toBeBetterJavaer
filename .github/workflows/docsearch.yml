@@ -1,21 +1,17 @@
-name: docsearch
-
+name: deploy
 on:
   push:
-    branches:
-      - master
+  workflow_dispatch:
+
 jobs:
-  algolia:
+  generate-algolia:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Get the content of docsearch.json as config
-        id: algolia_config
-        run: echo "::set-output name=config::$(cat docsearch.json | jq -r tostring)"
-
-      - name: Run algolia/docsearch-scraper image
-        env:
-          ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
-          ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
-          CONFIG: ${{ steps.algolia_config.outputs.config }}
+      - uses: caibingcheng/hugo-algolia2@v1
+        with:
+          input: "./posts/**"
+          output: "./algolia.json"
+          index: ${{ secrets.ALGOlIA_INDEX }}
+          apikey: ${{ secrets.ALGOlIA_APIKEY }}
+          appid: ${{ secrets.ALGOlIA_APPID }}
